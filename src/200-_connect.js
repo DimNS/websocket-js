@@ -8,7 +8,7 @@ webSocketPHP._connect = function () {
     var ws = new WebSocket(webSocketPHP._settings.url + '/?sid=' + webSocketPHP._settings.sid);
 
     ws.onopen = function () {
-        if (webSocketPHP._settings.debug === true) {
+        if (typeof webSocketPHP._settings.debug === 'boolean' && webSocketPHP._settings.debug === true) {
             console.info('WebSocket connection success');
         }
 
@@ -21,13 +21,13 @@ webSocketPHP._connect = function () {
     };
 
     ws.onerror = function (error) {
-        if (webSocketPHP._settings.debug === true) {
+        if (typeof webSocketPHP._settings.debug === 'boolean' && webSocketPHP._settings.debug === true) {
             console.error('WebSocket error', error);
         }
     };
 
     ws.onclose = function (event) {
-        if (webSocketPHP._settings.debug === true) {
+        if (typeof webSocketPHP._settings.debug === 'boolean' && webSocketPHP._settings.debug === true) {
             if (event.wasClean) {
                 console.info('WebSocket connection is closed');
             } else {
