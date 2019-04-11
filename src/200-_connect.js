@@ -1,28 +1,42 @@
 /**
  * Подключение к WebSocket серверу
  *
- * @version 27.03.2019
+ * @version 11.04.2019
  * @author  Дмитрий Щербаков <atomcms@ya.ru>
  */
 webSocketPHP._connect = function () {
     var ws = new WebSocket(webSocketPHP._settings.url + '/?sid=' + webSocketPHP._settings.sid);
 
     ws.onopen = function () {
-        console.info('WebSocket connection success');
+        if (webSocketPHP._settings.debug === true) {
+            console.info('WebSocket connection success');
+        }
 
         // При успешном подключении сбрасываем попытки подключений
         webSocketPHP._settings.attemptsNum = 0;
+
+        if (typeof webSocketPHP._settings.onConnect === 'function') {
+            webSocketPHP._settings.onConnect();
+        }
     };
 
     ws.onerror = function (error) {
-        console.error('WebSocket error', error);
+        if (webSocketPHP._settings.debug === true) {
+            console.error('WebSocket error', error);
+        }
     };
 
     ws.onclose = function (event) {
-        if (event.wasClean) {
-            console.info('WebSocket connection is closed');
-        } else {
-            console.error('WebSocket connection failure code: ' + event.code);
+        if (webSocketPHP._settings.debug === true) {
+            if (event.wasClean) {
+                console.info('WebSocket connection is closed');
+            } else {
+                console.error('WebSocket connection failure code: ' + event.code);
+            }
+        }
+
+        if (typeof webSocketPHP._settings.onDisconnect === 'function') {
+            webSocketPHP._settings.onDisconnect();
         }
 
         // Проверяем номер попытки
@@ -38,6 +52,8 @@ webSocketPHP._connect = function () {
     };
 
     ws.onmessage = function (result) {
-        webSocketPHP._settings.onMessage(JSON.parse(result.data));
+        if (typeof webSocketPHP._settings.onMessage === 'function') {
+            webSocketPHP._settings.onMessage(JSON.parse(result.data));
+        }
     };
 };
